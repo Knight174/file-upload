@@ -48,10 +48,10 @@ router.post("/files", upload.array("files", 10), (req, res) => {
 // base64 文件
 router.post("/file_base64", (req, res) => {
   try {
-    const imgData = req.body.file; // 从请求体中读取base64字符串数据
+    const imgData = req.body.file; // 从请求体中读取base64字符串数据，json 中的要写 "file"
     const fileName =
       Date.now() + "." + imgData.split(";")[0].split("/").slice(-1)[0]; // 生成文件名
-    const savePath = "./public/uploads/" + fileName;
+    const savePath = "./public/data/uploads/" + fileName;
     const base64Data = imgData.replace(/^data:([A-Za-z-+/]+);base64,/, "");
     fs.writeFileSync(savePath, base64Data, { encoding: "base64" });
     res.json({
