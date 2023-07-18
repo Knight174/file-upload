@@ -33,7 +33,7 @@ router.post("/file", upload.single("file"), (req, res) => {
   });
 });
 
-// 多文件上传（限制 100 个文件
+// 多文件上传（限制 10 个文件
 router.post("/files", upload.array("files", 10), (req, res) => {
   const { files } = req;
   const fileUrls = files.map((file) => "/data/uploads/" + file.filename);
