@@ -1,6 +1,36 @@
-## 一个文件上传 Demo
+## Upload Demo
 
-前端：React + TS，后端：Express
+- Client：React + TS
+- Server：Express
+
+## Start Client
+
+```bash
+cd client
+npm i
+npm run dev
+```
+
+## Start Server
+
+```bash
+cd server
+mkdir public/data/uploads # files will be stored here
+npm i
+npm run start
+```
+
+## Features
+
+- singe file upload
+- multiple file upload
+- base64 file upload
+
+## Road map
+
+- Multipart upload
+
+## Reference
 
 - https://www.expressjs.com.cn/en/resources/middleware/multer.html
 - https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input/file
