@@ -36,6 +36,12 @@ router.post("/file", upload.single("file"), (req, res) => {
 // 多文件上传（限制 10 个文件
 router.post("/files", upload.array("files", 10), (req, res) => {
   const { files } = req;
+  if (!files.length) {
+    res.json({
+      code: 500,
+      message: "请重新上传！",
+    });
+  }
   const fileUrls = files.map((file) => "/data/uploads/" + file.filename);
 
   res.json({
@@ -61,7 +67,7 @@ router.post("/file_base64", (req, res) => {
   } catch (error) {
     res.statusCode = 500;
     res.json({
-      code: 0,
+      code: 500,
       error,
     });
   }
