@@ -79,7 +79,6 @@ router.post('/multipart', (req, res) => {
   const form = new multiparty.Form();
   form.parse(req, function (err, fields, files) {
     if (err) {
-      console.log(11111);
       res.json({
         code: 500,
         message: '服务器端错误',
@@ -103,12 +102,59 @@ router.post('/multipart', (req, res) => {
 
 // 切片上传完成，进行文件合并
 router.post('/multipart_merge', (req, res) => {
-  const body = req.body;
-  console.log('合并文件', body);
+  const { name, extname } = req.body;
+  streamMerge(
+    './public/data/uploads/multipart/' + name,
+    './public/data/uploads/multipart/' + name + '.' + extname
+  );
   res.json({
     code: 200,
-    message: `文件：${body.name}.${body.extname}， 合并成功！`,
+    message: `文件：${name}.${extname}， 合并成功！`,
+    data: {
+      url: '/public/data/uploads/multipart/' + name + '.' + extname,
+    },
   });
 });
+
+// （流合并）将源文件合并成目标文件
+// chunksDir 某文件切片目录
+// targetFile 目标文件
+const streamMerge = (chunksDir, targetFile) => {
+  const tmpFileList = fs.readdirSync(chunksDir); // 读取目录中的文件，返回文件名称组成的列表
+  const fileList = tmpFileList.map((name) => ({
+    name,
+    filePath: path.resolve(chunksDir, name),
+  }));
+  // 创建写入流，不管读取文件流，然后写入目标文件
+  const fileWriteStream = fs.createWriteStream(targetFile);
+  writeStream(fileList, fileWriteStream, chunksDir);
+};
+
+/**
+ * 合并指定目录的每一个切片，然后移除指定目录
+ * @param {*} fileList        文件数据
+ * @param {*} fileWriteStream 最终的写入结果
+ * @param {*} chunksDir     文件路径
+ */
+const writeStream = (fileList, fileWriteStream, chunksDir) => {
+  if (!fileList.length) {
+    // 如果文件切片列表为空，结束流写入
+    fileWriteStream.end();
+    // 删除临时目录
+    if (chunksDir) {
+      fs.rmdirSync(chunksDir, { recursive: true, force: true });
+      return;
+    }
+  }
+  const data = fileList.shift(); // 取第一个数据（每次从头部取一个出来处理，直到取完）
+  const { filePath: chunkFilePath } = data;
+  const currentReadStream = fs.createReadStream(chunkFilePath); // 读取文件
+  // 将读取到的文件流通过管道与写入流合并在一起
+  currentReadStream.pipe(fileWriteStream, { end: false });
+  // 当读取完毕时，循环读取并拼接下一个文件数据，直到 fileList 为空
+  currentReadStream.on('end', () => {
+    writeStream(fileList, fileWriteStream, chunksDir);
+  });
+};
 
 module.exports = router;
