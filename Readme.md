@@ -1,4 +1,6 @@
-## Upload Demo
+# File upload
+
+A common file upload code example.
 
 - Client：React + TS
 - Server：Express
