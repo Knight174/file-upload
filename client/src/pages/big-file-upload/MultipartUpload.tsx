@@ -39,7 +39,8 @@ export const MultipartUpload: React.FC = () => {
         extname: file.name.split('.').slice(-1)[0], // 文件后缀
       }
     );
-    console.log('response', response);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    window.alert(response.data.message);
   };
 
   const uploadChunk = (formData: FormData) => {
