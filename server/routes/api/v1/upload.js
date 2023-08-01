@@ -75,12 +75,29 @@ router.post('/file_base64', (req, res) => {
 });
 
 // 切片上传
-router.post('/multipart', upload.single('chunk'), (req, res) => {
-  const { body } = req;
-  console.log(body);
+router.post('/multipart', (req, res) => {
+  const form = new multiparty.Form();
+  form.parse(req, function (err, fields, files) {
+    if (err) {
+      console.log(11111);
+      res.json({
+        code: 500,
+        message: '服务器端错误',
+      });
+    }
+
+    // 临时转存目录
+    const tempPath = './public/data/uploads/multipart/' + fields.name[0];
+    // 把每次上传的切片进行统一存储到临时目录
+    fs.mkdirSync(tempPath, {
+      recursive: true, // 不存在即创建
+    });
+    // 修改路径，转存到临时目录
+    fs.renameSync(files['chunk'][0].path, tempPath + '/' + fields.index[0]);
+  });
   res.json({
     code: 200,
-    message: `切片：${body.index} ，上传成功！`,
+    message: `切片上传成功！`,
   });
 });
 
