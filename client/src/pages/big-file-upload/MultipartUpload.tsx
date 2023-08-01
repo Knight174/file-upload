@@ -1,11 +1,13 @@
+import axios from 'axios';
+
 export const MultipartUpload: React.FC = () => {
   const handleUpload = async (file: File) => {
     const chunkSize = 1024 * 1024; // 每个切片的大小（这里设置为1MB）
     const totalChunks = Math.ceil(file.size / chunkSize); // 总的切片数
     let uploadedChunks = 0; // 已上传的切片数
+    const uuid = crypto.randomUUID();
 
     for (let start = 0; start < file.size; start += chunkSize) {
-      const uuid = crypto.randomUUID();
       const chunk = file.slice(start, start + chunkSize);
       const formData = new FormData();
       formData.append('chunk', chunk);
@@ -30,6 +32,14 @@ export const MultipartUpload: React.FC = () => {
     }
 
     console.log('Upload complete');
+    const response = await axios.post(
+      'http://localhost:3000/api/v1/upload/multipart_merge',
+      {
+        name: uuid, // 文件名称
+        extname: file.name.split('.').slice(-1)[0], // 文件后缀
+      }
+    );
+    console.log('response', response);
   };
 
   const uploadChunk = (formData: FormData) => {
@@ -39,15 +49,20 @@ export const MultipartUpload: React.FC = () => {
     // 替换上面的 fetch 请求为你实际使用的方式
 
     // 模拟异步请求
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // 模拟上传成功
-        resolve('success');
+    // return new Promise((resolve, reject) => {
+    //   setTimeout(() => {
+    //     // 模拟上传成功
+    //     resolve('success');
 
-        // 模拟上传失败
-        // reject(new Error('Upload failed'));
-      }, 1000);
-    });
+    //     // 模拟上传失败
+    //     // reject(new Error('Upload failed'));
+    //   }, 1000);
+    // });
+
+    return axios.post(
+      'http://localhost:3000/api/v1/upload/multipart',
+      formData
+    );
   };
 
   const retryChunk = async (formData: FormData) => {
