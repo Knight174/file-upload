@@ -22,13 +22,9 @@ npm run start
 
 ## Features
 
-- singe file upload
-- multiple file upload
-- base64 file upload
-
-## Road map
-
-- Multipart upload
+[x] singe / multiple file upload
+[x] base64 file upload
+[x] multipart upload
 
 ## Reference
 
